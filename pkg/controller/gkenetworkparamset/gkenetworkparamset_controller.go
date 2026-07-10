@@ -178,12 +178,15 @@ func NewGKENetworkParamSetController(
 		},
 	})
 
+	hasIPv6 := false
 	for _, clusterCIDR := range clusterCIDRs {
 		if netutils.IsIPv4CIDR(clusterCIDR) {
 			c.clusterDefaultIPv4PodCIDR = clusterCIDR.String()
+		} else if netutils.IsIPv6CIDR(clusterCIDR) {
+			hasIPv6 = true
 		}
 	}
-	if c.clusterDefaultIPv4PodCIDR == "" {
+	if c.clusterDefaultIPv4PodCIDR == "" && !hasIPv6 {
 		klog.Fatal("Controller: Must specify --cluster-cidr for GKE VPC native cluster")
 	}
 
